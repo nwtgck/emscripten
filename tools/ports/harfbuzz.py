@@ -4,7 +4,6 @@
 # found in the LICENSE file.
 
 import os
-import logging
 
 VERSION = '3.2.0'
 HASH = '2e5ab5ad83a0d8801abd3f82a276f776a0ad330edc0ab843f879dd7ad3fd2e0dc0e9a3efbb6c5f2e67d14c0e37f0d9abdb40c5e25d8231a357c0025669f219c3'
@@ -86,8 +85,6 @@ def get(ports, settings, shared):
   ports.fetch_project('harfbuzz', f'https://storage.googleapis.com/webassembly/emscripten-ports/harfbuzz-{VERSION}.tar.gz', sha512hash=HASH)
 
   def create(final):
-    logging.info('building port: harfbuzz')
-
     source_path = os.path.join(ports.get_dir(), 'harfbuzz', 'harfbuzz-' + VERSION)
     freetype_include = ports.get_include_dir('freetype2')
     ports.install_headers(os.path.join(source_path, 'src'), target='harfbuzz')
