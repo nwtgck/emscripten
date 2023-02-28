@@ -190,7 +190,7 @@ var LibraryWebGL2 = {
   glGenQueries__sig: 'vii',
   glGenQueries__deps: ['_glGenObject'],
   glGenQueries: function(n, ids) {
-    __glGenObject(n, ids, 'createQuery', GL.queries
+    GL.genObject(n, ids, 'createQuery', GL.queries
 #if GL_ASSERTIONS
     , 'glGenQueries'
 #endif
@@ -270,7 +270,7 @@ var LibraryWebGL2 = {
   glGenSamplers__sig: 'vii',
   glGenSamplers__deps: ['_glGenObject'],
   glGenSamplers: function(n, samplers) {
-    __glGenObject(n, samplers, 'createSampler', GL.samplers
+    GL.genObject(n, samplers, 'createSampler', GL.samplers
 #if GL_ASSERTIONS
     , 'glGenSamplers'
 #endif
@@ -281,18 +281,18 @@ var LibraryWebGL2 = {
   glDeleteSamplers: function(n, samplers) {
     for (var i = 0; i < n; i++) {
       var id = {{{ makeGetValue('samplers', 'i*4', 'i32') }}};
-      var sampler = GL.samplers[id];
+      var sampler = GL.samplers.get(id);
       if (!sampler) continue;
       GLctx['deleteSampler'](sampler);
       sampler.name = 0;
-      GL.samplers[id] = null;
+      GL.samplers.free(id);
     }
   },
 
   glIsSampler__sig: 'ii',
   glIsSampler: function(id) {
-    var sampler = GL.samplers[id];
-    if (!sampler) return 0;
+    if (!GL.samplers.allocated[id]) return 0;
+    var sampler = GL.samplers.get(id);
     return GLctx['isSampler'](sampler);
   },
 
@@ -301,7 +301,7 @@ var LibraryWebGL2 = {
 #if GL_ASSERTIONS
     GL.validateGLObjectID(GL.samplers, sampler, 'glBindSampler', 'sampler');
 #endif
-    GLctx['bindSampler'](unit, GL.samplers[sampler]);
+    GLctx['bindSampler'](unit, GL.samplers.get(sampler));
   },
 
   glSamplerParameterf__sig: 'viif',
@@ -309,7 +309,7 @@ var LibraryWebGL2 = {
 #if GL_ASSERTIONS
     GL.validateGLObjectID(GL.samplers, sampler, 'glBindSampler', 'sampler');
 #endif
-    GLctx['samplerParameterf'](GL.samplers[sampler], pname, param);
+    GLctx['samplerParameterf'](GL.samplers.get(sampler), pname, param);
   },
 
   glSamplerParameteri__sig: 'viii',
@@ -317,7 +317,7 @@ var LibraryWebGL2 = {
 #if GL_ASSERTIONS
     GL.validateGLObjectID(GL.samplers, sampler, 'glBindSampler', 'sampler');
 #endif
-    GLctx['samplerParameteri'](GL.samplers[sampler], pname, param);
+    GLctx['samplerParameteri'](GL.samplers.get(sampler), pname, param);
   },
 
   glSamplerParameterfv__sig: 'viii',
@@ -326,7 +326,7 @@ var LibraryWebGL2 = {
     GL.validateGLObjectID(GL.samplers, sampler, 'glBindSampler', 'sampler');
 #endif
     var param = {{{ makeGetValue('params', '0', 'float') }}};
-    GLctx['samplerParameterf'](GL.samplers[sampler], pname, param);
+    GLctx['samplerParameterf'](GL.samplers.get(sampler), pname, param);
   },
 
   glSamplerParameteriv__sig: 'viii',
@@ -335,7 +335,7 @@ var LibraryWebGL2 = {
     GL.validateGLObjectID(GL.samplers, sampler, 'glBindSampler', 'sampler');
 #endif
     var param = {{{ makeGetValue('params', '0', 'i32') }}};
-    GLctx['samplerParameteri'](GL.samplers[sampler], pname, param);
+    GLctx['samplerParameteri'](GL.samplers.get(sampler), pname, param);
   },
 
   glGetSamplerParameterfv__sig: 'viii',
@@ -351,7 +351,7 @@ var LibraryWebGL2 = {
       return;
     }
 #endif
-    {{{ makeSetValue('params', '0', 'GLctx[\'getSamplerParameter\'](GL.samplers[sampler], pname)', 'float') }}};
+    {{{ makeSetValue('params', '0', 'GLctx[\'getSamplerParameter\'](GL.samplers.get(sampler), pname)', 'float') }}};
   },
 
   glGetSamplerParameteriv__sig: 'viii',
@@ -367,14 +367,14 @@ var LibraryWebGL2 = {
       return;
     }
 #endif
-    {{{ makeSetValue('params', '0', 'GLctx[\'getSamplerParameter\'](GL.samplers[sampler], pname)', 'i32') }}};
+    {{{ makeSetValue('params', '0', 'GLctx[\'getSamplerParameter\'](GL.samplers.get(sampler), pname)', 'i32') }}};
   },
 
   // Transform Feedback
   glGenTransformFeedbacks__sig: 'vii',
   glGenTransformFeedbacks__deps: ['_glGenObject'],
   glGenTransformFeedbacks: function(n, ids) {
-    __glGenObject(n, ids, 'createTransformFeedback', GL.transformFeedbacks
+    GL.genObject(n, ids, 'createTransformFeedback', GL.transformFeedbacks
 #if GL_ASSERTIONS
     , 'glGenTransformFeedbacks'
 #endif
@@ -385,25 +385,23 @@ var LibraryWebGL2 = {
   glDeleteTransformFeedbacks: function(n, ids) {
     for (var i = 0; i < n; i++) {
       var id = {{{ makeGetValue('ids', 'i*4', 'i32') }}};
-      var transformFeedback = GL.transformFeedbacks[id];
+      var transformFeedback = GL.transformFeedbacks.get(id);
       if (!transformFeedback) continue; // GL spec: "unused names in ids are ignored, as is the name zero."
       GLctx['deleteTransformFeedback'](transformFeedback);
       transformFeedback.name = 0;
-      GL.transformFeedbacks[id] = null;
+      GL.transformFeedbacks.free(id);
     }
   },
 
   glIsTransformFeedback__sig: 'ii',
   glIsTransformFeedback: function(id) {
-    return GLctx['isTransformFeedback'](GL.transformFeedbacks[id]);
+    return GLctx['isTransformFeedback'](GL.transformFeedbacks.get(id));
   },
 
   glBindTransformFeedback__sig: 'vii',
   glBindTransformFeedback: function(target, id) {
-#if GL_ASSERTIONS
-    GL.validateGLObjectID(GL.transformFeedbacks, id, 'glBindTransformFeedback', 'id');
-#endif
-    GLctx['bindTransformFeedback'](target, GL.transformFeedbacks[id]);
+#if GL_ASSERTIONS GL.validateGLObjectID(GL.transformFeedbacks, id, 'glBindTransformFeedback', 'id'); #endif
+    GLctx['bindTransformFeedback'](target, GL.transformFeedbacks.get(id));
   },
 
   glTransformFeedbackVaryings__sig: 'viiii',
@@ -702,9 +700,8 @@ var LibraryWebGL2 = {
   glFenceSync: function(condition, flags) {
     var sync = GLctx.fenceSync(condition, flags);
     if (sync) {
-      var id = GL.getNewId(GL.syncs);
+      var id = GL.syncs.allocate(sync);
       sync.name = id;
-      GL.syncs[id] = sync;
       return id;
     }
     return 0; // Failed to create a sync object
@@ -713,14 +710,14 @@ var LibraryWebGL2 = {
   glDeleteSync__sig: 'vi',
   glDeleteSync: function(id) {
     if (!id) return;
-    var sync = GL.syncs[id];
+    var sync = GL.syncs.get(id);
     if (!sync) { // glDeleteSync signals an error when deleting a nonexisting object, unlike some other GL delete functions.
       GL.recordError(0x501 /* GL_INVALID_VALUE */);
       return;
     }
     GLctx.deleteSync(sync);
     sync.name = 0;
-    GL.syncs[id] = null;
+    GL.syncs.free(id);
   },
 
   glClientWaitSync__sig: 'iiij',
@@ -733,7 +730,7 @@ var LibraryWebGL2 = {
     // Inherently the value accepted in the timeout is lossy, and can't take in arbitrary u64 bit pattern (but most likely doesn't matter)
     // See https://www.khronos.org/registry/webgl/specs/latest/2.0/#5.15
     {{{ receiveI64ParamAsI53Unchecked('timeout'); }}}
-    return GLctx.clientWaitSync(GL.syncs[sync], flags, timeout);
+    return GLctx.clientWaitSync(GL.syncs.get(sync), flags, timeout);
   },
 
   glWaitSync__sig: 'viij',
@@ -743,7 +740,7 @@ var LibraryWebGL2 = {
   glWaitSync: function(sync, flags, {{{ defineI64Param('timeout') }}}) {
     // See WebGL2 vs GLES3 difference on GL_TIMEOUT_IGNORED above (https://www.khronos.org/registry/webgl/specs/latest/2.0/#5.15)
     {{{ receiveI64ParamAsI53Unchecked('timeout'); }}}
-    GLctx.waitSync(GL.syncs[sync], flags, timeout);
+    GLctx.waitSync(GL.syncs.get(sync), flags, timeout);
   },
 
   glGetSynciv__sig: 'viiiii',
@@ -768,7 +765,7 @@ var LibraryWebGL2 = {
       return;
     }
 #endif
-    var ret = GLctx.getSyncParameter(GL.syncs[sync], pname);
+    var ret = GLctx.getSyncParameter(GL.syncs.get(sync), pname);
     if (ret !== null) {
       {{{ makeSetValue('values', '0', 'ret', 'i32') }}};
       if (length) {{{ makeSetValue('length', '0', '1', 'i32') }}}; // Report a single value outputted.

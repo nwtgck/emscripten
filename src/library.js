@@ -3719,7 +3719,8 @@ mergeInto(LibraryManager.library, {
 
   $HandleAllocator__docs: '/** @constructor */',
   $HandleAllocator: function() {
-    this.allocated = [];
+    // Reserve handle 0, so it can be used as the NULL handle.
+    this.allocated = [undefined];
     this.freelist = [];
     this.get = function(id) {
 #if ASSERTIONS
