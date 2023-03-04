@@ -28,6 +28,7 @@ import hashlib
 import json
 import logging
 import os
+import pprint
 import re
 import shlex
 import shutil
@@ -50,7 +51,6 @@ from tools.response_file import substitute_response_files
 from tools.minimal_runtime_shell import generate_minimal_runtime_html
 import tools.line_endings
 from tools import feature_matrix
-from tools import deps_info
 from tools import js_manipulation
 from tools import wasm2c
 from tools import webassembly
@@ -1333,7 +1333,12 @@ There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR P
   js_syms = {}
   if not settings.SIDE_MODULE:
     js_syms = get_all_js_syms()
-    deps_info.append_deps_info(js_syms)
+    if not settings.USES_DYNAMIC_ALLOC:
+      for value in js_syms.values():
+        if 'malloc' in value:
+          value.remove('malloc')
+        if 'free' in value:
+          value.remove('free')
 
   phase_calculate_system_libraries(state, linker_arguments, linker_inputs, newargs)
 
@@ -2076,11 +2081,6 @@ def phase_linker_setup(options, state, newargs):
     if settings.MAIN_MODULE == 1:
       settings.INCLUDE_FULL_LIBRARY = 1
     settings.DEFAULT_LIBRARY_FUNCS_TO_INCLUDE += ['$preloadDylibs']
-
-  # If we are including the entire JS library then we know for sure we will, by definition,
-  # require all the reverse dependencies.
-  if settings.INCLUDE_FULL_LIBRARY:
-    default_setting('REVERSE_DEPS', 'all')
 
   if settings.MAIN_MODULE == 1 or settings.SIDE_MODULE == 1:
     settings.LINKABLE = 1

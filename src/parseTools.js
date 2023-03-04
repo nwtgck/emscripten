@@ -921,7 +921,7 @@ function makeMalloc(source, param) {
     return `_malloc(${param})`;
   }
   // It should be impossible to call some functions without malloc being
-  // included, unless we have a deps_info.json bug. To let closure not error
+  // included, unless we have a missing __deps entry. To let closure not error
   // on `_malloc` not being present, they don't call malloc and instead abort
   // with an error at runtime.
   // TODO: A more comprehensive deps system could catch this at compile time.

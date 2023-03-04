@@ -45,6 +45,7 @@ $cancel_notification
 $dispose_chunk
 $dlfree
 $dlmalloc
+$dlmemalign
 $do_dispatch_to_thread
 $em_queued_call_malloc
 $em_task_queue_cancel

@@ -486,7 +486,7 @@ mergeInto(LibraryManager.library, {
   },
 
   emscripten_wget_data__sig: 'vpppp',
-  emscripten_wget_data__deps: ['$asyncLoad', 'malloc'],
+  emscripten_wget_data__deps: ['$asyncLoad', 'malloc', 'free'],
   emscripten_wget_data: function(url, pbuffer, pnum, perror) {
     return Asyncify.handleSleep((wakeUp) => {
       asyncLoad(UTF8ToString(url), (byteArray) => {

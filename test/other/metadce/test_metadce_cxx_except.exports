@@ -12,6 +12,7 @@ dynCall_jiji
 dynCall_viijii
 getTempRet0
 main
+malloc
 memory
 setTempRet0
 setThrew
