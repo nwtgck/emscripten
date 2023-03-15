@@ -43,6 +43,7 @@ let LibraryWebAudio = {
   // dependency, because the user will not be able to utilize the node unless they call emscriptenGetAudioObject()
   // on it on JS side to connect it to the graph, so this avoids the user needing to manually do it on the command line.
   emscripten_create_audio_context__deps: ['$emscriptenRegisterAudioObject', '$emscriptenGetAudioObject'],
+  emscripten_create_audio_context__sig: 'ip',
   emscripten_create_audio_context: function(options) {
     let ctx = window.AudioContext || window.webkitAudioContext;
 #if ASSERTIONS
@@ -126,10 +127,8 @@ let LibraryWebAudio = {
   emscripten_start_wasm_audio_worklet_thread_async__deps: [
     'wasm_workers_id',
     '$_EmAudioDispatchProcessorCallback'],
+  emscripten_start_wasm_audio_worklet_thread_async__sig: 'vipipp',
   emscripten_start_wasm_audio_worklet_thread_async: function(contextHandle, stackLowestAddress, stackSize, callback, userData) {
-#if !AUDIO_WORKLET
-    abort('emscripten_create_wasm_audio_worklet() requires building with -s AUDIO_WORKLET=1 enabled!');
-#endif
 
 #if ASSERTIONS
     assert(contextHandle, `Called emscripten_start_wasm_audio_worklet_thread_async() with a null Web Audio Context handle!`);
@@ -157,7 +156,7 @@ let LibraryWebAudio = {
 #if WEBAUDIO_DEBUG
       console.error(`emscripten_start_wasm_audio_worklet_thread_async() addModule() failed!`);
 #endif
-      {{{ makeDynCall('viii', 'callback') }}}(contextHandle, 0/*EM_FALSE*/, userData);
+      {{{ makeDynCall('viip', 'callback') }}}(contextHandle, 0/*EM_FALSE*/, userData);
     };
 
     // Does browser not support AudioWorklets?

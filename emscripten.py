@@ -886,6 +886,7 @@ def create_wasm64_wrappers(metadata):
     '_emscripten_thread_free_data': '_p',
     '_emscripten_dlsync_self_async': '_p',
     '_emscripten_proxy_dlsync_async': '_pp',
+    'emscripten_wasm_worker_initialize': '_p_',
   }
 
   wasm64_wrappers = '''

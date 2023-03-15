@@ -414,7 +414,7 @@ If manually bisecting:
 
   # Tests that user .html shell files can manually download .data files created with --preload-file cmdline.
   @parameterized({
-    'default': ([],),
+    '': ([],),
     'pthreads': (['-pthread', '-sPROXY_TO_PTHREAD', '-sEXIT_RUNTIME'],),
   })
   @requires_threads
@@ -5496,7 +5496,8 @@ Module["preRun"].push(function () {
 
   # Tests the AudioWorklet demo
   @parameterized({
-    'default': ([],),
+    '': ([],),
+    'memory64': (['-sMEMORY64', '-Wno-experimental'],),
     'with_fs': (['--preload-file', test_file('hello_world.c') + '@/'],),
     'closure': (['--closure', '1', '-Oz'],),
     'asyncify': (['-sASYNCIFY'],),
@@ -5510,7 +5511,7 @@ Module["preRun"].push(function () {
 
   # Tests that posting functions between the main thread and the audioworklet thread works
   @parameterized({
-    'default': ([],),
+    '': ([],),
     'closure': (['--closure', '1', '-Oz'],),
   })
   def test_audio_worklet_post_function(self, args):
