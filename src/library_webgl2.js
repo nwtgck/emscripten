@@ -6,7 +6,7 @@
 
 var LibraryWebGL2 = {
   glGetStringi__deps: ['$stringToNewUTF8'],
-  glGetStringi__sig: 'iii',
+  glGetStringi__sig: 'pii',
   glGetStringi: function(name, index) {
     if (GL.currentContext.version < 2) {
       GL.recordError(0x502 /* GL_INVALID_OPERATION */); // Calling GLES3/WebGL2 function with a GLES2/WebGL1 context

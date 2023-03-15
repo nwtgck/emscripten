@@ -1149,9 +1149,10 @@ var LibraryGL = {
     GLctx.pixelStorei(pname, param);
   },
 
-  glGetString__sig: 'ii',
+  glGetString__sig: 'pi',
   glGetString__deps: ['$stringToNewUTF8'],
   glGetString: function(name_) {
+    err('glGetString');
     var ret = GL.stringCache[name_];
     if (!ret) {
       switch (name_) {
@@ -1400,25 +1401,25 @@ var LibraryGL = {
     }
   },
 
-  glGetIntegerv__sig: 'vii',
+  glGetIntegerv__sig: 'vip',
   glGetIntegerv__deps: ['$emscriptenWebGLGet'],
   glGetIntegerv: function(name_, p) {
     emscriptenWebGLGet(name_, p, {{{ cDefine('EM_FUNC_SIG_PARAM_I') }}});
   },
 
-  glGetFloatv__sig: 'vii',
+  glGetFloatv__sig: 'vip',
   glGetFloatv__deps: ['$emscriptenWebGLGet'],
   glGetFloatv: function(name_, p) {
     emscriptenWebGLGet(name_, p, {{{ cDefine('EM_FUNC_SIG_PARAM_F') }}});
   },
 
-  glGetBooleanv__sig: 'vii',
+  glGetBooleanv__sig: 'vip',
   glGetBooleanv__deps: ['$emscriptenWebGLGet'],
   glGetBooleanv: function(name_, p) {
     emscriptenWebGLGet(name_, p, {{{ cDefine('EM_FUNC_SIG_PARAM_B') }}});
   },
 
-  glDeleteTextures__sig: 'vii',
+  glDeleteTextures__sig: 'vip',
   glDeleteTextures: function(n, textures) {
     for (var i = 0; i < n; i++) {
       var id = {{{ makeGetValue('textures', 'i*4', 'i32') }}};
@@ -1430,7 +1431,7 @@ var LibraryGL = {
     }
   },
 
-  glCompressedTexImage2D__sig: 'viiiiiiii',
+  glCompressedTexImage2D__sig: 'viiiiiiip',
   glCompressedTexImage2D: function(target, level, internalFormat, width, height, border, imageSize, data) {
 #if MAX_WEBGL_VERSION >= 2
     if ({{{ isCurrentContextWebGL2() }}}) { // WebGL 2 provides new garbage-free entry points to call to WebGL. Use those always when possible.
@@ -1633,7 +1634,7 @@ var LibraryGL = {
     GLctx.bindTexture(target, GL.textures[texture]);
   },
 
-  glGetTexParameterfv__sig: 'viii',
+  glGetTexParameterfv__sig: 'viip',
   glGetTexParameterfv: function(target, pname, params) {
     if (!params) {
       // GLES2 specification does not specify how to behave if params is a null pointer. Since calling this function does not make sense
@@ -1647,7 +1648,7 @@ var LibraryGL = {
     {{{ makeSetValue('params', '0', 'GLctx.getTexParameter(target, pname)', 'float') }}};
   },
 
-  glGetTexParameteriv__sig: 'viii',
+  glGetTexParameteriv__sig: 'viip',
   glGetTexParameteriv: function(target, pname, params) {
     if (!params) {
       // GLES2 specification does not specify how to behave if params is a null pointer. Since calling this function does not make sense
@@ -1684,7 +1685,6 @@ var LibraryGL = {
   // merge the functions together to only have one generated copy of this. 'createFunction' refers to the WebGL context function name to do
   // the actual creation, 'objectTable' points to the GL object table where to populate the created objects, and 'functionName' carries
   // the name of the caller for debug information.
-  _glGenObject__sig: 'vii',
   _glGenObject: function(n, buffers, createFunction, objectTable
 #if GL_ASSERTIONS
     , functionName
@@ -1707,7 +1707,7 @@ var LibraryGL = {
   },
 
   glGenBuffers__deps: ['_glGenObject'],
-  glGenBuffers__sig: 'vii',
+  glGenBuffers__sig: 'vip',
   glGenBuffers: function(n, buffers) {
     __glGenObject(n, buffers, 'createBuffer', GL.buffers
 #if GL_ASSERTIONS
@@ -1717,7 +1717,7 @@ var LibraryGL = {
   },
 
   glGenTextures__deps: ['_glGenObject'],
-  glGenTextures__sig: 'vii',
+  glGenTextures__sig: 'vip',
   glGenTextures: function(n, textures) {
     __glGenObject(n, textures, 'createTexture', GL.textures
 #if GL_ASSERTIONS
@@ -1726,7 +1726,7 @@ var LibraryGL = {
       );
   },
 
-  glDeleteBuffers__sig: 'vii',
+  glDeleteBuffers__sig: 'vip',
   glDeleteBuffers: function(n, buffers) {
     for (var i = 0; i < n; i++) {
       var id = {{{ makeGetValue('buffers', 'i*4', 'i32') }}};
@@ -3615,7 +3615,7 @@ var LibraryGL = {
                                     GL.textures[texture], level);
   },
 
-  glGetFramebufferAttachmentParameteriv__sig: 'viiii',
+  glGetFramebufferAttachmentParameteriv__sig: 'viiip',
   glGetFramebufferAttachmentParameteriv: function(target, attachment, pname, params) {
     var result = GLctx.getFramebufferAttachmentParameter(target, attachment, pname);
     if (result instanceof WebGLRenderbuffer ||
@@ -4059,7 +4059,7 @@ var LibraryGL = {
     return mem;
   },
 
-  glGetBufferPointerv__sig: 'viii',
+  glGetBufferPointerv__sig: 'viip',
   glGetBufferPointerv__deps: ['$emscriptenWebGLGetBufferBinding'],
   glGetBufferPointerv: function(target, pname, params) {
     if (pname == 0x88BD/*GL_BUFFER_MAP_POINTER*/) {
